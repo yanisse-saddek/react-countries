@@ -15,13 +15,14 @@ export default class App extends React.Component{
     }
   }
   getCountry = (country)=>{
-    var url = `https://restcountries.com/v3.1/name/${country}`
+    var url = `http://localhost:8000/country/${country}`
       axios(url).then((resultat)=>{
         var myCountries = []
         resultat.data.map(pays=>{
-          var country = {name:pays.name.common,
+          var country = {
+            name:pays.name,
             capital:pays.capital,
-            flag:pays.flags.png,
+            flag:pays.flag,
             population:pays.population,
             region:pays.region
           }

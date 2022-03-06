@@ -1,55 +1,52 @@
-import React, {useState} from 'react'
+import React, { useState } from 'react'
 import axios from 'axios'
 import Button from './components/Button'
 import Card from './components/Card'
+import Range from './components/Range'
 
-export default class App extends React.Component{
-  constructor(props){
+export default class App extends React.Component {
+  constructor(props) {
     super(props)
     this.state = {
-      toReturn: [
-
-      ],
-       countries : [
-       ]
+      toReturn: [],
+      countries: [],
+      range:10,
+      countryNum:20
     }
   }
-  getCountry = (country)=>{
-    var url = `http://localhost:8000/country/${country}`
-      axios(url).then((resultat)=>{
-        var myCountries = []
-        resultat.data.map(pays=>{
-          var country = {
-            name:pays.name,
-            capital:pays.capital,
-            flag:pays.flag,
-            population:pays.population,
-            region:pays.region
-          }
-          myCountries.push(country)
-        })
-        this.setState({
-          countries:myCountries
-        })
-
-        var array =  []
-        myCountries.map(country=>{
-          array.push(<Card name={country.name} capital={country.capital} flag={country.flag} population={country.population} region={country.region}/> )
-        })
-        this.setState({
-          toReturn:array
-        })
+  componentDidMount = () => {
+    var num=0;
+    axios('https://restcountries.com/v3.1/all').then(result => {
+      var array = []
+      var countryNum=0
+      result.data.map(pays => {
+        countryNum++
+        if(num<this.state.range){
+          array.push(<Card data={pays} />)
+          num++
+        }
       })
+      this.setState({
+        toReturn: array,
+        countryNum:countryNum
+      })
+    })
   }
-  getList= ()=>{
+  getList = () => {
     return this.state.toReturn
   }
-
-  render(){
+  range = (e) => {
+    this.setState({
+      range:e.target.value
+    })
+    this.componentDidMount()
+  }
+  render() {
     return <div className="container">
-              <h1>Country searcher</h1>
-          <Button onClick={this.getCountry}>France</Button>
-            <div className="row">{this.getList()}</div>
+      <h1>Country searcher</h1>
+      <Button onClick={this.getCountry} />
+      <Range range={this.range} minMax={this.state.countryNum}/>
+      <div className="row">{this.getList()}</div>
     </div>
   }
 }
